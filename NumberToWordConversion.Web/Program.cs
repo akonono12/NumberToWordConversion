@@ -1,4 +1,5 @@
 using FluentValidation;
+using NumberToWordConversion.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,12 @@ var assembly = AppDomain.CurrentDomain.Load("NumberToWordConversion.Application"
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssembly(assembly));
 builder.Services.AddValidatorsFromAssembly(assembly);
 
+builder.Services.AddTransient<INumberToWordService,NumberToWordService>();
+
+builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
+{
+    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
 
 var app = builder.Build();
 
@@ -23,7 +30,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
+app.UseCors("corsapp");
 
 app.MapControllerRoute(
     name: "default",
